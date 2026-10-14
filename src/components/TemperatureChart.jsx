@@ -8,11 +8,19 @@ import {
     ResponsiveContainer
 } from 'recharts';
 
-function TemperatureChart({ weather }) {
-    const data = weather.daily.time.map((date, index) => ({
-        date,
-        temperature: weather.daily.temperature_2m_mean[index]
-    }));
+function TemperatureChart({ weather, temperatureUnit = 'C' }) {
+    const data = weather.daily.time.map((date, index) => {
+        const temperature = weather.daily.temperature_2m_mean[index];
+
+        return {
+            date,
+            temperature: temperatureUnit === 'F'
+                ? temperature * 9 / 5 + 32
+                : temperature
+        };
+    });
+
+    const unit = temperatureUnit === 'F' ? '°F' : '°C';
 
     return (
         <div className="temperature-chart">
@@ -40,7 +48,7 @@ function TemperatureChart({ weather }) {
                     />
 
                     <YAxis
-                        unit="°C"
+                        unit={unit}
                         tick={{ fontSize: 12 }}
                     />
 
@@ -57,7 +65,10 @@ function TemperatureChart({ weather }) {
                         itemStyle={{
                             color: '#e8eefb'
                         }}
-                        formatter={(value) => [`${value.toFixed(1)}°C`, 'Temperatura']}
+                        formatter={(value) => [
+                            `${Number(value).toFixed(1)}${unit}`,
+                            'Temperatura'
+                        ]}
                         labelFormatter={(date) => `Data: ${date}`}
                     />
 

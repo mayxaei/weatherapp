@@ -1,8 +1,10 @@
+
 import { useEffect, useState } from 'react';
 
 export function useWeatherLogic() {
+    const [position, setPosition] = useState([51.38, 21.17]);
     const [weather, setWeather] = useState(null);
-    const [position, setPosition] = useState([51.3841, 21.1741]);
+    const [city, setCity] = useState('');
     const [startDate, setStartDate] = useState('');
     const [endDate, setEndDate] = useState('');
     const [historicalWeather, setHistoricalWeather] = useState(null);
@@ -14,71 +16,121 @@ export function useWeatherLogic() {
 
     useEffect(() => {
         fetch(
-            `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,wind_speed_10m,relative_humidity_2m,cloud_cover&timezone=auto`
+            `https://localhost:7039/WeatherForecast/now?latitude=${latitude}&longitude=${longitude}`
         )
-            .then(response => response.json())
-            .then(data => {
-                setWeather(data.current);
+            .then(async response => {
+                if (!response.ok) {
+                    throw new Error(await response.text());
+                }
+
+                return response.json();
+            })
+            .then(setWeather)
+            .catch(error => {
+                setError(error.message || 'Nie udało się pobrać aktualnej pogody.');
             });
     }, [latitude, longitude]);
 
-    const handleGetWeather = () => {
+    const handleSearchCity = (selectedCity = null) => {
         setError('');
-        setHistoricalWeather(null);
 
-        if (!startDate || !endDate) {
-            setError('Wybierz obie daty.');
+        if (selectedCity) {
+            setPosition([
+                Number(selectedCity.latitude),
+                Number(selectedCity.longitude)
+            ]);
             return;
         }
 
-        if (startDate > endDate) {
-            setError(
-                'Data początkowa nie może być późniejsza niż data końcowa.'
-            );
+        if (!city.trim()) {
+            setError('Wpisz nazwę miasta.');
             return;
         }
 
-        setLoading(true);
-
-        const url =
-            `https://archive-api.open-meteo.com/v1/archive?` +
-            `latitude=${latitude}` +
-            `&longitude=${longitude}` +
-            `&start_date=${startDate}` +
-            `&end_date=${endDate}` +
-            `&daily=temperature_2m_mean` +
-            `&timezone=auto`;
-
-        fetch(url)
-            .then(response => {
+        fetch(
+            `https://localhost:7039/WeatherForecast/city?city=${encodeURIComponent(city)}`
+        )
+            .then(async response => {
                 if (!response.ok) {
-                    throw new Error('Nie udało się pobrać danych.');
+                    throw new Error(await response.text());
                 }
 
                 return response.json();
             })
             .then(data => {
-                setHistoricalWeather(data);
+                setPosition([
+                    Number(data.latitude),
+                    Number(data.longitude)
+                ]);
             })
-            .catch(() => {
-                setError('Nie udało się pobrać danych pogodowych.');
-            })
-            .finally(() => {
-                setLoading(false);
+            .catch(error => {
+                setError(error.message || 'Nie udało się znaleźć miasta.');
             });
+    };
+
+    const loadHistoricalWeather = async (
+        lat = latitude,
+        lon = longitude,
+        start = startDate,
+        end = endDate
+    ) => {
+        setError('');
+
+        if (!start || !end) {
+            setError('Wybierz obie daty.');
+            return;
+        }
+
+        if (start > end) {
+            setError('Data początkowa nie może być późniejsza niż końcowa.');
+            return;
+        }
+
+        setLoading(true);
+
+        try {
+            const url =
+                `https://localhost:7039/WeatherForecast/archive?` +
+                `latitude=${lat}&longitude=${lon}` +
+                `&startDate=${start}&endDate=${end}`;
+
+            const response = await fetch(url);
+
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
+
+            const data = await response.json();
+            setHistoricalWeather(data);
+        } catch (error) {
+            setError(error.message || 'Nie udało się pobrać danych pogodowych.');
+            setHistoricalWeather(null);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleGetWeather = () => {
+        loadHistoricalWeather();
     };
 
     return {
         weather,
         position,
         setPosition,
+        city,
+        setCity,
         startDate,
         setStartDate,
         endDate,
         setEndDate,
         historicalWeather,
+        setHistoricalWeather,
         loading,
         error,
-        handleGetWeather
+        setError,
+        handleSearchCity,
+        handleGetWeather,
+        loadHistoricalWeather
     };
 }

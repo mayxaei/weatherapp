@@ -49,7 +49,7 @@ export function useWeatherLogic() {
         }
 
         fetch(
-            `${API_URL}/WeatherForecast/city?city=${encodeURIComponent(city)}`
+            `${API_URL}/WeatherForecast/cities?city=${encodeURIComponent(city)}`
         )
             .then(async response => {
                 if (!response.ok) {

@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import './SavedCharts.css';
 
+const API_URL = import.meta.env.VITE_API_URL;
+
 function SavedCharts({
     savedCharts = [],
     chartsLoading,
@@ -27,7 +29,7 @@ function SavedCharts({
         const timeout = setTimeout(async () => {
             try {
                 const response = await fetch(
-                    `https://localhost:7039/WeatherForecast/cities?city=${encodeURIComponent(editLocation)}`
+                    `${API_URL}/WeatherForecast/cities?city=${encodeURIComponent(editLocation)}`
                 );
 
                 if (!response.ok) {

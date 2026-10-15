@@ -1,4 +1,3 @@
-
 import { useState, useEffect, useCallback } from 'react'
 import { BrowserRouter, Routes, Route, Link, useLocation, useNavigate } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -9,7 +8,8 @@ import RegisterForm from './components/RegisterForm'
 import Statistics from './components/Statistics'
 import SettingsPage from './components/SettingsPage'
 
-const SETTINGS_URL = 'https://localhost:7039/Settings'
+const API_URL = import.meta.env.VITE_API_URL
+const SETTINGS_URL = `${API_URL}/Settings`
 
 const getSystemTheme = () =>
   window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'

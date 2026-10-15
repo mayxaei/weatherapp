@@ -1,9 +1,9 @@
-
 import { useEffect, useRef, useState } from 'react';
 import Button from './Button';
 import './CitySearch.css';
 
-const API_URL = 'https://localhost:7039/SavedLocations';
+const API_URL = import.meta.env.VITE_API_URL;
+const SAVED_LOCATIONS_URL = `${API_URL}/SavedLocations`;
 
 function CitySearch({ city, setCity, handleSearchCity }) {
     const [suggestions, setSuggestions] = useState([]);
@@ -26,7 +26,7 @@ function CitySearch({ city, setCity, handleSearchCity }) {
         }
 
         try {
-            const response = await fetch(API_URL, {
+            const response = await fetch(SAVED_LOCATIONS_URL, {
                 headers: {
                     Authorization: `Bearer ${token}`
                 }
@@ -61,7 +61,7 @@ function CitySearch({ city, setCity, handleSearchCity }) {
 
         const timeout = setTimeout(() => {
             fetch(
-                `https://localhost:7039/WeatherForecast/cities?city=${encodeURIComponent(city)}`
+                `${API_URL}/WeatherForecast/cities?city=${encodeURIComponent(city)}`
             )
                 .then(response => {
                     if (!response.ok) {
@@ -133,7 +133,7 @@ function CitySearch({ city, setCity, handleSearchCity }) {
         }
 
         try {
-            const response = await fetch(API_URL, {
+            const response = await fetch(SAVED_LOCATIONS_URL, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -184,7 +184,7 @@ function CitySearch({ city, setCity, handleSearchCity }) {
         }
 
         try {
-            const response = await fetch(`${API_URL}/${id}`, {
+            const response = await fetch(`${SAVED_LOCATIONS_URL}/${id}`, {
                 method: 'DELETE',
                 headers: {
                     Authorization: `Bearer ${token}`

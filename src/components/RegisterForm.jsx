@@ -1,7 +1,8 @@
-
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import './LoginForm.css';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function RegisterForm() {
     const [username, setUsername] = useState('');
@@ -29,7 +30,7 @@ function RegisterForm() {
 
         try {
             const response = await fetch(
-                'https://localhost:7039/Users/register',
+                `${API_URL} /Users/register`,
                 {
                     method: 'POST',
                     headers: {

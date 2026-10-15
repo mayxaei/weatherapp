@@ -1,7 +1,8 @@
-
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import './LoginForm.css'
+
+const API_URL = import.meta.env.VITE_API_URL
 
 function LoginForm() {
     const [login, setLogin] = useState('')
@@ -21,7 +22,7 @@ function LoginForm() {
 
         try {
             const response = await fetch(
-                'https://localhost:7039/Users/login',
+                `${API_URL} /Users/login`,
                 {
                     method: 'POST',
                     headers: {
@@ -74,7 +75,6 @@ function LoginForm() {
     return (
         <div className="login-page">
             <div className="login-container">
-
                 <form
                     className="login-form"
                     onSubmit={handleSubmit}
@@ -153,7 +153,6 @@ function LoginForm() {
                         ← Wróć do strony głównej
                     </button>
                 </div>
-
             </div>
         </div>
     )

@@ -1,9 +1,8 @@
-
 import { useEffect, useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import './SettingsPage.css'
 
-const SETTINGS_URL = 'https://localhost:7039/Settings'
+const SETTINGS_URL = `${import.meta.env.VITE_API_URL}/Settings`
 
 const getSystemTheme = () =>
     window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark'

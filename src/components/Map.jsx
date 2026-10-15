@@ -10,8 +10,8 @@ import TemperatureChart from './TemperatureChart';
 import { useWeatherLogic } from './MapLogic';
 import SavedCharts from './SavedCharts';
 
-const API_URL = 'https://localhost:7039/WeatherCharts';
-const SETTINGS_URL = 'https://localhost:7039/Settings';
+const API_URL = `${import.meta.env.VITE_API_URL}/WeatherCharts`;
+const SETTINGS_URL = `${import.meta.env.VITE_API_URL}/Settings`;
 
 const formatDate = date => String(date ?? '').slice(0, 10);
 

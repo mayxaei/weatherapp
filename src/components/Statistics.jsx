@@ -1,7 +1,8 @@
-
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import './Statistics.css';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 function Statistics() {
     const [statistics, setStatistics] = useState(null);
@@ -18,7 +19,7 @@ function Statistics() {
             return;
         }
 
-        fetch('https://localhost:7039/Statistics', {
+        fetch(`${API_URL}/Statistics`, {
             headers: {
                 Authorization: `Bearer ${token}`
             }

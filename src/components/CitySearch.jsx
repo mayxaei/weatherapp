@@ -91,13 +91,16 @@ function CitySearch({ city, setCity, handleSearchCity }) {
         };
     }, []);
 
+
     const handleSelectCity = selected => {
+        skipSuggestionsRef.current = true;
         setCity(selected.name);
         setSelectedCity(selected);
         setSuggestions([]);
         setSaveMessage('');
         handleSearchCity(selected);
     };
+
 
     const handleSearch = () => {
         setSuggestions([]);

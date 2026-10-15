@@ -62,8 +62,15 @@ export function useWeatherLogic() {
         setError('');
 
         try {
+
             if (selectedCity) {
-                setPosition(getCoordinates(selectedCity));
+                const [lat, lon] = getCoordinates(selectedCity);
+                setPosition([lat, lon]);
+
+                if (startDate && endDate && startDate <= endDate) {
+                    await loadHistoricalWeather(lat, lon, startDate, endDate);
+                }
+
                 return;
             }
 
@@ -86,7 +93,13 @@ export function useWeatherLogic() {
                 throw new Error('Nie znaleziono miasta.');
             }
 
-            setPosition(getCoordinates(data[0]));
+            const [lat, lon] = getCoordinates(data[0]);
+            setPosition([lat, lon]);
+
+            if (startDate && endDate && startDate <= endDate) {
+                await loadHistoricalWeather(lat, lon, startDate, endDate);
+            }
+
         } catch (error) {
             setError(error.message || 'Nie udało się znaleźć miasta.');
         }

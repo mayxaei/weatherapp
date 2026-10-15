@@ -2,6 +2,24 @@ import { useEffect, useState } from 'react';
 //test
 const API_URL = import.meta.env.VITE_API_URL;
 
+function getCoordinates(data) {
+    const latitude = Number(data?.latitude ?? data?.Latitude);
+    const longitude = Number(data?.longitude ?? data?.Longitude);
+
+    if (
+        !Number.isFinite(latitude) ||
+        !Number.isFinite(longitude) ||
+        latitude < -90 ||
+        latitude > 90 ||
+        longitude < -180 ||
+        longitude > 180
+    ) {
+        throw new Error('Nie otrzymano prawidłowych współrzędnych lokalizacji.');
+    }
+
+    return [latitude, longitude];
+}
+
 export function useWeatherLogic() {
     const [position, setPosition] = useState([51.38, 21.17]);
     const [weather, setWeather] = useState(null);
@@ -16,6 +34,14 @@ export function useWeatherLogic() {
     const longitude = position[1];
 
     useEffect(() => {
+        if (
+            !Number.isFinite(latitude) ||
+            !Number.isFinite(longitude)
+        ) {
+            setError('Lokalizacja ma nieprawidłowe współrzędne.');
+            return;
+        }
+
         fetch(
             `${API_URL}/WeatherForecast/now?latitude=${latitude}&longitude=${longitude}`
         )
@@ -32,41 +58,34 @@ export function useWeatherLogic() {
             });
     }, [latitude, longitude]);
 
-    const handleSearchCity = (selectedCity = null) => {
+    const handleSearchCity = async (selectedCity = null) => {
         setError('');
 
-        if (selectedCity) {
-            setPosition([
-                Number(selectedCity.latitude),
-                Number(selectedCity.longitude)
-            ]);
-            return;
+        try {
+            if (selectedCity) {
+                setPosition(getCoordinates(selectedCity));
+                return;
+            }
+
+            if (!city.trim()) {
+                setError('Wpisz nazwę miasta.');
+                return;
+            }
+
+            const response = await fetch(
+                `${API_URL}/WeatherForecast/cities?city=${encodeURIComponent(city)}`
+            );
+
+            if (!response.ok) {
+                throw new Error(await response.text());
+            }
+
+            const data = await response.json();
+
+            setPosition(getCoordinates(data));
+        } catch (error) {
+            setError(error.message || 'Nie udało się znaleźć miasta.');
         }
-
-        if (!city.trim()) {
-            setError('Wpisz nazwę miasta.');
-            return;
-        }
-
-        fetch(
-            `${API_URL}/WeatherForecast/cities?city=${encodeURIComponent(city)}`
-        )
-            .then(async response => {
-                if (!response.ok) {
-                    throw new Error(await response.text());
-                }
-
-                return response.json();
-            })
-            .then(data => {
-                setPosition([
-                    Number(data.latitude),
-                    Number(data.longitude)
-                ]);
-            })
-            .catch(error => {
-                setError(error.message || 'Nie udało się znaleźć miasta.');
-            });
     };
 
     const loadHistoricalWeather = async (
@@ -84,6 +103,11 @@ export function useWeatherLogic() {
 
         if (start > end) {
             setError('Data początkowa nie może być późniejsza niż końcowa.');
+            return;
+        }
+
+        if (!Number.isFinite(Number(lat)) || !Number.isFinite(Number(lon))) {
+            setError('Lokalizacja ma nieprawidłowe współrzędne.');
             return;
         }
 

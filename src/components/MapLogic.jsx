@@ -1,5 +1,6 @@
-
 import { useEffect, useState } from 'react';
+
+const API_URL = import.meta.env.VITE_API_URL;
 
 export function useWeatherLogic() {
     const [position, setPosition] = useState([51.38, 21.17]);
@@ -16,7 +17,7 @@ export function useWeatherLogic() {
 
     useEffect(() => {
         fetch(
-            `https://localhost:7039/WeatherForecast/now?latitude=${latitude}&longitude=${longitude}`
+            `${API_URL}/WeatherForecast/now?latitude=${latitude}&longitude=${longitude}`
         )
             .then(async response => {
                 if (!response.ok) {
@@ -48,7 +49,7 @@ export function useWeatherLogic() {
         }
 
         fetch(
-            `https://localhost:7039/WeatherForecast/city?city=${encodeURIComponent(city)}`
+            `${API_URL}/WeatherForecast/city?city=${encodeURIComponent(city)}`
         )
             .then(async response => {
                 if (!response.ok) {
@@ -90,7 +91,7 @@ export function useWeatherLogic() {
 
         try {
             const url =
-                `https://localhost:7039/WeatherForecast/archive?` +
+                `${API_URL}/WeatherForecast/archive?` +
                 `latitude=${lat}&longitude=${lon}` +
                 `&startDate=${start}&endDate=${end}`;
 

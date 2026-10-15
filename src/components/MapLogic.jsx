@@ -82,7 +82,11 @@ export function useWeatherLogic() {
 
             const data = await response.json();
 
-            setPosition(getCoordinates(data));
+            if (!Array.isArray(data) || data.length === 0) {
+                throw new Error('Nie znaleziono miasta.');
+            }
+
+            setPosition(getCoordinates(data[0]));
         } catch (error) {
             setError(error.message || 'Nie udało się znaleźć miasta.');
         }
